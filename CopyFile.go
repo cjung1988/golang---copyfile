@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
+
+var BUFFERSIZE int = 1024
 
 // main function
 // need arguments source destination
@@ -41,59 +44,89 @@ func main() {
 // CopyFile return an error if the copy function fail
 // else the error is nil
 func copyFile(src, dst string) error {
-	return nil
-}
 
-/*
-Source from Opensource.com -- see Readme.md for more information
-func copy(src, dst string, BUFFERSIZE int64) error {
-	sourceFileStat, err := os.Stat(src)
+	// source
+	srcFileStat, err := os.Stat(src)
 	if err != nil {
+		fmt.Printf("Error copyFile -> srcFileStat-Error: %s", err)
 		return err
 	}
 
-	if !sourceFileStat.Mode().IsRegular() {
-		return fmt.Errorf("%s is not a regular file.", src)
+	// IsRegular reports whether m describes a regular file.
+	if !srcFileStat.Mode().IsRegular() {
+
+		// return a error when the file is not a regular file
+		return fmt.Errorf("%s is not a regular file", src)
+	}
+
+	// check if the file is a folder
+	if fileIsFolder(src) {
+
+		// return error when the file is a folder
+		fmt.Errorf("%s is a folder", src)
 	}
 
 	source, err := os.Open(src)
 	if err != nil {
+		fmt.Printf("Error copyFile -> open file: %s", err)
 		return err
 	}
+
+	// defer get called if the surrounding functions returns
+	// "source.Close()" is the last func that get called inside of this function
 	defer source.Close()
 
+	// destination
 	_, err = os.Stat(dst)
-	if err == nil {
-		return fmt.Errorf("File %s already exists.", dst)
+	if err != nil {
+		return fmt.Errorf("file %s already exists", dst)
 	}
 
 	destination, err := os.Create(dst)
 	if err != nil {
+
+		// return error
 		return err
 	}
+
+	// defer get called if the surrounding functions returns
+	// "source.Close()" is the last func that get called inside of this function
 	defer destination.Close()
 
 	if err != nil {
 		panic(err)
 	}
 
+	// create empty buffer
 	buf := make([]byte, BUFFERSIZE)
 	for {
+		// read the sourceFile in the buffer
 		n, err := source.Read(buf)
+
+		// check the error
 		if err != nil && err != io.EOF {
+
+			// return the error
 			return err
 		}
+
+		// get out of the for loop if the size of n is zero
 		if n == 0 {
+
+			// break the for loop
 			break
 		}
 
+		// try to write the buffer inside of the destination file, size is n
 		if _, err := destination.Write(buf[:n]); err != nil {
+
+			// return the error
 			return err
 		}
 	}
+
 	return err
 }
-*/
 
 // fileIsFolder check if the file exist and if the file is a folder
 // return bool
