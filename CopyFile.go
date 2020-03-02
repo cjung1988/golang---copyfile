@@ -124,13 +124,13 @@ func copyFile(src, dst string) error {
 			return err
 		}
 	}
-
 	return err
 }
 
 // fileIsFolder check if the file exist and if the file is a folder
 // return bool
 func fileIsFolder(filename string) bool {
+
 	// Stat returns a FileInfo describing the named file.
 	// If there is an error, it will be of type *PathError.
 	info, error := os.Stat(filename)
@@ -147,6 +147,7 @@ func fileIsFolder(filename string) bool {
 // bool If the file exist and is not a folder
 // int64 Size of the file -> file size is 0, if the file don't exist
 func fileExists(filename string) (bool, int64) {
+
 	// Stat returns a FileInfo describing the named file.
 	// If there is an error, it will be of type *PathError.
 	info, error := os.Stat(filename)
